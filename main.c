@@ -15,12 +15,12 @@ int main () {
     cjto = itree_insertar(cjto, 8, 8);
     cjto = itree_insertar(cjto, 0, 0);
     ITree cjto2 = itree_insertar(NULL, 2, 3);
-    cjto2 = itree_insetar(cjto2, 3, 4);
-    cjto2 = itree_insetar(cjto2, 9, 10);
-    cjto2 = itree_insetar(cjto2, 97, 100);
-    cjto2 = itree_insetar(cjto2, -1, 0);
-    cjto2 = itree_insetar(cjto2, 56, 57);
-    cjto2 = itree_insetar(cjto2, 25, 25);
+    cjto2 = itree_insertar(cjto2, 3, 4);
+    cjto2 = itree_insertar(cjto2, 9, 10);
+    cjto2 = itree_insertar(cjto2, 97, 100);
+    cjto2 = itree_insertar(cjto2, -1, 0);
+    cjto2 = itree_insertar(cjto2, 56, 57);
+    cjto2 = itree_insertar(cjto2, 25, 25);
     ITree cjto3 = itree_union(cjto, cjto2, 1);
     ITree cjto4 = itree_inter(cjto, cjto2, NULL);
     itree_recorrer_bfs(cjto);

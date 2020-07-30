@@ -296,7 +296,7 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
 void itree_recorrer_dfs(ITree raiz) {
   if (raiz != NULL) {
     // Se imprime la raiz
-    printf ("[%lf, %lf]\n", raiz->inicio, raiz->fin);
+    printf ("[%d, %d]\n", raiz->inicio, raiz->fin);
     // Se vuelve a llamar a la función recursivamente para imprimir el subárbol izquierdo
     itree_recorrer_dfs(raiz->izq);
     // y luego el derecho
@@ -321,7 +321,7 @@ void itree_recorrer_bfs(ITree tree) {
       }
 
       // Lo imprimimos y luego lo eliminamos
-      printf("[%lf, %lf]\n", ((ITree)(queue->dato))->inicio, ((ITree)(queue->dato))->fin);
+      printf("[%d, %d]\n", ((ITree)(queue->dato))->inicio, ((ITree)(queue->dato))->fin);
       queue = slist_eliminar_inicio(queue);
     }
   }
