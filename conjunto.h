@@ -4,11 +4,19 @@
 #include <stddef.h>
 #include "slist.h"
 
+typedef struct
+{
+    int inicio;
+    int fin;
+} Intervalo;
+
+
 
 typedef struct _ITNodo
 {
-    int inicio; // Inicio del intervalo
-    int fin; // Final del intervalo
+    /*int inicio; // Inicio del intervalo
+    int fin; // Final del intervalo*/
+    Intervalo *inte; // Intervalo
     struct _ITNodo *izq; // Subárbol izquierdo
     struct _ITNodo *der; // Subárbol derecho
     int alt;
@@ -55,7 +63,7 @@ ITree nuevo_nodo(int inicio, int final);
 /**
  * Inserta un intervalo en un árbol de intervalos.
  */
-ITree itree_insertar(ITree nodo, int inicio, int final);
+ITree itree_insertar(ITree nodo, int inicio, int final, ITree cjtoref);
 
 /**
  * Se fija si determinado intervalo se encuentra en un árbol de intervalos.
@@ -84,5 +92,7 @@ void itree_recorrer_dfs(ITree raiz);
  * Recorrido primero a lo ancho del árbol de intervalos.
  */
 void itree_recorrer_bfs(ITree tree);
+
+void itree_imprimir(ITree raiz);
 
 #endif /* __CONJUNTO_H__ */

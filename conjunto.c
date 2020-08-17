@@ -11,6 +11,7 @@ void itree_destruir(ITree tree) {
   if (tree != NULL){
     itree_destruir(tree->izq);
     itree_destruir(tree->der);
+    free(tree->inte);
     free(tree);
   }
 }
@@ -110,8 +111,10 @@ ITree nodo_clonar (int inicio, int final, int alt) {
     ITree nodo = malloc(sizeof(ITNodo));
     nodo->izq = NULL;
     nodo->der = NULL;
-    nodo->inicio = inicio;
-    nodo->fin = final;
+    Intervalo* inte = malloc(sizeof(Intervalo));
+    nodo->inte = inte;
+    nodo->inte->inicio = inicio;
+    nodo->inte->fin = final;
     nodo->alt = alt;
     return nodo;
 }
@@ -121,7 +124,7 @@ ITree itree_clonar (ITree nodo) {
     if (nodo == NULL) {
         return NULL;
     }
-    ITree nuevo = nodo_clonar(nodo->inicio, nodo->fin, nodo->alt);
+    ITree nuevo = nodo_clonar(nodo->inte->inicio, nodo->inte->fin, nodo->alt);
     nuevo->izq = itree_clonar(nodo->izq);
     nuevo->der = itree_clonar(nodo->der);
     return nuevo;
@@ -134,14 +137,18 @@ ITree nuevo_nodo(int inicio, int final) {
   // Al tratarse de una hoja, no tendrá hijos, su max será su final y su altura, 1
   nodo->izq = NULL;
   nodo->der = NULL;
-  nodo->inicio = inicio;
-  nodo->fin = final;
+  Intervalo* inte = malloc(sizeof(Intervalo));
+  nodo->inte = inte;
+  nodo->inte->inicio = inicio;
+  nodo->inte->fin = final;
   nodo->alt = 1;
   return nodo;
 }
 
 
-ITree itree_insertar(ITree nodo, int inicio, int final) {
+ITree itree_insertar(ITree nodo, int inicio, int final, ITree cjtoref) {
+  // cjto ref va a ser pasado como = nodo al principio y luego se mantendra
+
   // Si estamos en posición para agregar, agregamos el nodo como una hoja
   if (nodo == NULL) {
     return nuevo_nodo(inicio, final);
@@ -149,40 +156,60 @@ ITree itree_insertar(ITree nodo, int inicio, int final) {
 
   // PONER ANTES SI SON IGUALES BAI
   // Si no varía en valores significa que el nodo ya se encuentra en el árbol
-  if (nodo->inicio == inicio && nodo->fin == final) {
+  if (nodo->inte->inicio == inicio && nodo->inte->fin == final) {
     printf("El elemento ya se encuentra en el árbol \n");
     return nodo;
   }
 
   // COMO INTERSECA?
-  if (inicio <= nodo->inicio) {
-      if (nodo->inicio <= final && final <= nodo->fin){
-          final = nodo->fin;
-          nodo->izq = itree_insertar(itree_eliminar_r(nodo, nodo->inicio, nodo->fin),
-           inicio, final);
+  if (inicio <= nodo->inte->inicio) {
+      // Caso 1 { [ } ]
+      if (nodo->inte->inicio <= final && final < nodo->inte->fin){
+        if (nodo->der != NULL || nodo->izq != NULL) {
+          final = nodo->inte->fin;
+          itree_eliminar_r(cjtoref, nodo->inte->inicio, nodo->inte->fin);
+          cjtoref = itree_insertar(cjtoref, inicio, final, cjtoref);
+        }
+        else {
+          nodo->inte->inicio = inicio;
+        }
       }
-      else if (nodo->fin <= final) {
-          nodo->izq = itree_insertar(itree_eliminar_r(nodo, nodo->inicio, nodo->fin),
-           inicio, final);
-      }
-      // nno interseca
-      else if (final < nodo->inicio) {
-          nodo->izq = itree_insertar(nodo->izq, inicio, final);
-      }
-  }
-  else if (nodo->inicio <= inicio) {
-      if (inicio <= nodo->fin && nodo->fin <= final){
-          inicio = nodo->inicio;
-          nodo->der = itree_insertar(itree_eliminar_r(nodo, nodo->inicio, nodo->fin),
-           inicio, final);
-      }
-      else if (final <= nodo->fin) {
-          nodo->der = itree_insertar(itree_eliminar_r(nodo, nodo->inicio, nodo->fin),
-           inicio, final);
+      // Caso 3 { [ ] }
+      else if (nodo->inte->fin <= final) {
+        if (nodo->der != NULL || nodo->izq != NULL) {
+          itree_eliminar_r(cjtoref, nodo->inte->inicio, nodo->inte->fin);
+          cjtoref = itree_insertar(cjtoref, inicio, final, cjtoref);
+        }
+        else {
+          nodo->inte->inicio = inicio;
+          nodo->inte->fin = final;
+        }
       }
       // no interseca
-      else if (inicio > nodo->fin) {
-          nodo->der = itree_insertar(nodo->der, inicio, final);
+      else if (final < nodo->inte->inicio) {
+          nodo->izq = itree_insertar(nodo->izq, inicio, final, cjtoref);
+      }
+  }
+  else if (nodo->inte->inicio <= inicio) {
+      // Caso 2 [ { ] }
+      if (inicio <= nodo->inte->fin && nodo->inte->fin < final){
+          if (nodo->izq != NULL || nodo->der != NULL) {
+            inicio = nodo->inte->inicio;
+            itree_eliminar_r(cjtoref, inicio, nodo->inte->fin);
+            //printf("\nelimine [%d, %d]\n", inicio, nodo->inte->fin);
+            cjtoref = itree_insertar(cjtoref, inicio, final, cjtoref);
+          }
+          else {
+            nodo->inte->fin = final;
+          }
+      }
+      // Caso 4 [ { } ]
+      else if (final <= nodo->inte->fin) {
+        return nodo;
+      }
+      // no interseca
+      else if (inicio > nodo->inte->fin) {
+          nodo->der = itree_insertar(nodo->der, inicio, final, cjtoref);
       }
   }
 
@@ -209,7 +236,6 @@ ITree itree_insertar(ITree nodo, int inicio, int final) {
 
   return (hacer_avl(nodo, balance));
 
-  return nodo;
 }
 
 ITree min_subarbol_derecho(ITree nodo) {
@@ -237,14 +263,17 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
   if (raiz == NULL) {
     return raiz;
   }
+
   // Vemos si tenemos que ir por izquierda
-  if (inicio < raiz->inicio || (inicio == raiz->inicio && final < raiz->fin)) {
+  if (final < raiz->inte->inicio) {
     raiz->izq = itree_eliminar_r(raiz->izq, inicio, final);
   }
   // o por derecha
-  else if (inicio > raiz->inicio || (inicio == raiz->inicio && final > raiz->fin)) {
+  else if (inicio > raiz->inte->fin) {
     raiz->der = itree_eliminar_r(raiz->der, inicio, final);
   }
+
+
   // Si estamos en el nodo a eliminar
   else if (raiz->izq == NULL || raiz->der == NULL) {
     // Si tiene hijo izquierdo tomaremos como temp al hijo izquierdo,
@@ -261,7 +290,9 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
     else {
       *raiz = *temp;
     }
+    free(temp->inte);
     free(temp);
+    // Si hay algun rpoblema con memoria dsp ver que puede ser por no liberar el inte
   }
   else { 
     // Si no pasó lo anterior, estamos en el caso de un nodo con 2 hijos
@@ -270,10 +301,10 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
     ITree temp = min_subarbol_derecho(raiz);
 
     // Este sera la nueva raiz asi que realizamos el cambio de valores
-    raiz->inicio = temp->inicio;
-    raiz->fin = temp->fin;
+    raiz->inte->inicio = temp->inte->inicio;
+    raiz->inte->fin = temp->inte->fin;
     // y lo "sacamos" de su posición eliminandolo
-    raiz->der = itree_eliminar_r(raiz->der, temp->inicio, temp->fin); // va a ser caso sin hijos so rapido
+    raiz->der = itree_eliminar_r(raiz->der, temp->inte->inicio, temp->inte->fin); // va a ser caso sin hijos so rapido
   }
   
   if (raiz == NULL){
@@ -292,11 +323,23 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
   return hacer_avl(raiz, balance);
 }
 
-  
+void itree_imprimir(ITree raiz) {
+  if (raiz != NULL) {
+    itree_imprimir(raiz->izq);
+    if (raiz->inte->inicio == raiz->inte->fin) {
+      printf("%d, ", raiz->inte->inicio); 
+    }
+    else {
+      printf("%d:%d, ", raiz->inte->inicio, raiz->inte->fin);
+    }
+    itree_imprimir(raiz->der);
+  }
+}
+
 void itree_recorrer_dfs(ITree raiz) {
   if (raiz != NULL) {
     // Se imprime la raiz
-    printf ("[%d, %d]\n", raiz->inicio, raiz->fin);
+    printf ("[%d, %d]\n", raiz->inte->inicio, raiz->inte->fin);
     // Se vuelve a llamar a la función recursivamente para imprimir el subárbol izquierdo
     itree_recorrer_dfs(raiz->izq);
     // y luego el derecho
@@ -321,7 +364,7 @@ void itree_recorrer_bfs(ITree tree) {
       }
 
       // Lo imprimimos y luego lo eliminamos
-      printf("[%d, %d]\n", ((ITree)(queue->dato))->inicio, ((ITree)(queue->dato))->fin);
+      printf("[%d, %d]\n", ((ITree)(queue->dato))->inte->inicio, ((ITree)(queue->dato))->inte->fin);
       queue = slist_eliminar_inicio(queue);
     }
   }
