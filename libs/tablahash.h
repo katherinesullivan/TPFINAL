@@ -41,8 +41,10 @@ void tablahash_insertar(TablaHash* tabla, char* clave, ITree dato);
 
 /**
  * Busca el conjunto en la tabla asociado a la clave dada.
- * En caso de que esté presente devuelve un puntero al mismo, 
+ * Si solo ver es 0, en caso de que esté presente devuelve un puntero al mismo, 
  * en caso contrario devuelve NULL.
+ * Si solover es 1, devuelve NULL si no está presente, y un puntero
+ * a su clave si lo está.
  */
 void* tablahash_buscar (TablaHash* tabla, char* clave, int solover);
 

@@ -1,5 +1,4 @@
 #include "conjunto.h"
-#include "slist.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -154,14 +153,16 @@ ITree itree_insertar(ITree nodo, int inicio, int final, ITree cjtoref) {
     return nuevo_nodo(inicio, final);
   }
 
-  // PONER ANTES SI SON IGUALES BAI
   // Si no varía en valores significa que el nodo ya se encuentra en el árbol
   if (nodo->inte->inicio == inicio && nodo->inte->fin == final) {
-    printf("El elemento ya se encuentra en el árbol \n");
+    //printf("El elemento ya se encuentra en el árbol \n");
     return nodo;
   }
 
-  // COMO INTERSECA?
+  // Si no nos encontrabamos en posicion para agregar, según
+  // cómo varía el intervalo respecto al del nodo donde estamos, vemos
+  // cómo interseca
+
   if (inicio <= nodo->inte->inicio) {
       // Caso 1 { [ } ]
       if (nodo->inte->inicio <= final && final < nodo->inte->fin){
@@ -213,15 +214,7 @@ ITree itree_insertar(ITree nodo, int inicio, int final, ITree cjtoref) {
       }
   }
 
-  /*// Si no nos encontrabamos en posicion para agregar, según
-  // cómo varía el intervalo respecto al del nodo donde estamos, vemos de 
-  // ir por izquierda o por derecha
-  else if (final < nodo->inicio) {
-    nodo->izq = itree_insertar(nodo->izq, inicio, final);
-  }
-  else if (inicio > nodo->fin) {
-    nodo->der = itree_insertar(nodo->der, inicio, final);
-  }*/
+  
   
   // Ajusto la altura de este antecesor al nodo agregado
   if (itree_altura(nodo->der) <= itree_altura(nodo->izq)) {
@@ -290,9 +283,7 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
     else {
       *raiz = *temp;
     }
-    free(temp->inte);
     free(temp);
-    // Si hay algun rpoblema con memoria dsp ver que puede ser por no liberar el inte
   }
   else { 
     // Si no pasó lo anterior, estamos en el caso de un nodo con 2 hijos
@@ -323,50 +314,37 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
   return hacer_avl(raiz, balance);
 }
 
-void itree_imprimir(ITree raiz) {
+// Obtenemos el intervalo que imprimiremos sin una coma al final
+Intervalo* maximo_inte(ITree raiz) {
   if (raiz != NULL) {
-    itree_imprimir(raiz->izq);
-    if (raiz->inte->inicio == raiz->inte->fin) {
+    if (raiz->der != NULL) {
+      maximo_inte(raiz->der);
+    }
+    else {
+      return raiz->inte;
+    }
+  }
+}
+
+// Función que imprime un cjto
+void itree_imprimir(ITree raiz, Intervalo* max) {
+  if (raiz != NULL) {
+    itree_imprimir(raiz->izq, max);
+    if (raiz->inte->inicio == max->inicio && raiz->inte->fin == max->fin) {
+      if (raiz->inte->inicio == raiz->inte->fin) {
+        printf("%d\n", raiz->inte->inicio); 
+      }
+      else {
+        printf("%d:%d\n", raiz->inte->inicio, raiz->inte->fin);
+      }
+    }
+    else if (raiz->inte->inicio == raiz->inte->fin) {
       printf("%d, ", raiz->inte->inicio); 
     }
     else {
       printf("%d:%d, ", raiz->inte->inicio, raiz->inte->fin);
     }
-    itree_imprimir(raiz->der);
-  }
-}
-
-void itree_recorrer_dfs(ITree raiz) {
-  if (raiz != NULL) {
-    // Se imprime la raiz
-    printf ("[%d, %d]\n", raiz->inte->inicio, raiz->inte->fin);
-    // Se vuelve a llamar a la función recursivamente para imprimir el subárbol izquierdo
-    itree_recorrer_dfs(raiz->izq);
-    // y luego el derecho
-    itree_recorrer_dfs(raiz->der);
-  }
-} // Hecho con preorden
-
-void itree_recorrer_bfs(ITree tree) {
-  // Si no se trata de un árbol vacío
-  if (tree != NULL) {
-    // Armamos una lista con la raíz
-    SList queue = slist_agregar_final(NULL, tree);
-
-    // Mientras no hayamos vaciado la cola
-    while (queue != NULL) {
-      // Agregamos los hijos del primer elemento de la queue en caso de tenerlos
-      if (((ITree)(queue->dato))->izq != NULL) {
-        queue = slist_agregar_final(queue, ((ITree)(queue->dato))->izq);
-      }
-      if (((ITree)(queue->dato))->der != NULL) {
-        queue = slist_agregar_final(queue, ((ITree)(queue->dato))->der);
-      }
-
-      // Lo imprimimos y luego lo eliminamos
-      printf("[%d, %d]\n", ((ITree)(queue->dato))->inte->inicio, ((ITree)(queue->dato))->inte->fin);
-      queue = slist_eliminar_inicio(queue);
-    }
+    itree_imprimir(raiz->der, max);
   }
 }
 

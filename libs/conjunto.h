@@ -2,7 +2,6 @@
 #define __CONJUNTO_H__
 
 #include <stddef.h>
-#include "slist.h"
 
 typedef struct
 {
@@ -82,17 +81,8 @@ ITree min_subarbol_derecho(ITree nodo);
  */
 ITree itree_eliminar_r(ITree nodo, int inicio, int final);
 
+void itree_imprimir(ITree raiz, Intervalo* max);
 
-/**
- * Recorrido primero en profundidad del árbol de intervalos.
- */
-void itree_recorrer_dfs(ITree raiz);
-
-/**
- * Recorrido primero a lo ancho del árbol de intervalos.
- */
-void itree_recorrer_bfs(ITree tree);
-
-void itree_imprimir(ITree raiz);
+Intervalo* maximo_inte(ITree raiz);
 
 #endif /* __CONJUNTO_H__ */

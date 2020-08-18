@@ -56,8 +56,10 @@ void tablahash_insertar(TablaHash* tabla, char* clave, ITree dato) {
 
 /**
  * Busca el conjunto en la tabla asociado a la clave dada.
- * En caso de que esté presente devuelve un puntero al mismo, 
+ * Si solover es 0, en caso de que esté presente devuelve un puntero al mismo, 
  * en caso contrario devuelve NULL.
+ * Si solover es 1, devuelve NULL si no está presente, y un puntero
+ * a su clave si lo está.
  */
 void* tablahash_buscar (TablaHash* tabla, char* clave, int solover) {
   int done = 0;
@@ -100,10 +102,8 @@ void tablahash_eliminar (TablaHash* tabla, char* clave) {
     }
     else if (strcmp(tabla->tabla[idx].clave, clave) == 0) {
       // Si estaba, eliminamos y marcamos como eliminado el casillero
-      tabla->tabla[idx].clave = NULL;
-      tabla->tabla[idx].dato = NULL;
-      // MAYBE 
-      // itree_destruir(tabla->tabla[idx].dato)
+      free(tabla->tabla[idx].clave);
+      itree_destruir(tabla->tabla[idx].dato);
       tabla->tabla[idx].estado = 2;
       // Disminuimos el nro de elementos 
       tabla->numElems--;
@@ -138,6 +138,10 @@ TablaHash* tablahash_agrandar(TablaHash* tabla) {
  * Destruye la tabla.
  */
 void tablahash_destruir(TablaHash* tabla) {
+  for (int i=0;i<tabla->capacidad;i++){
+    itree_destruir(tabla->tabla[i].dato);
+    free(tabla->tabla[i].clave);
+  }
   free(tabla->tabla);
   free(tabla);
 }
