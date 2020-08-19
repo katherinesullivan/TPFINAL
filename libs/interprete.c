@@ -127,6 +127,7 @@ int parse_input(TablaHash** diccionario, char* buffer) {
                         printf("Conjunto inexistente. Verifique su entrada.\n");
                     }
                 }
+                free(alias);
             }
 
             // Voy a hacer una opercion q requiere de 2 cjtos
@@ -184,6 +185,8 @@ int parse_input(TablaHash** diccionario, char* buffer) {
                         printf("Conjunto inexistente. Verifique su entrada.\n");
                     }
                 }
+                free(alias1);
+                free(alias2);
             }
         }
     }
