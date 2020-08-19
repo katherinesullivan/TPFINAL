@@ -27,7 +27,7 @@ int main() {
   TablaHash* diccionario = tablahash_crear(31, &hash, &hash2);
 
   char* buffer = malloc(200*sizeof(char));
-  printf("Puede comenzar a escribir:\n");
+  printf("Puede comenzar a escribir\n");
 
   do {
     flag = parse_input(&diccionario, buffer);

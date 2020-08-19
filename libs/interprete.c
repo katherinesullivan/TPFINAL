@@ -130,7 +130,7 @@ int parse_input(TablaHash** diccionario, char* buffer) {
                 free(alias);
             }
 
-            // Voy a hacer una opercion q requiere de 2 cjtos
+            // Voy a hacer una operción que requiere de 2 cjtos
             else {
                 char* alias1 = malloc(sizeof(char)*30);
                 char* alias2 = malloc(sizeof(char)*30);
@@ -193,6 +193,7 @@ int parse_input(TablaHash** diccionario, char* buffer) {
     return 1;
 }
 
+// Verifica que determinados sscanf hayan podido leer la información adecuada 
 int check_read(int process, int expected) {
     if (process == expected) {
         return 1;

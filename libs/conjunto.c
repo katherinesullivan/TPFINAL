@@ -326,7 +326,7 @@ Intervalo* maximo_inte(ITree raiz) {
   }
 }
 
-// Función que imprime un cjto
+// Función que imprime un cjto, haciendo recursión con inorder
 void itree_imprimir(ITree raiz, Intervalo* max) {
   if (raiz != NULL) {
     itree_imprimir(raiz->izq, max);

@@ -33,6 +33,7 @@ ITree itree_comunes (ITree nodo, int inicio, int final, ITree cjto) {
     if (nodo == NULL) {
         return cjto;
     }
+
     // Vemos como intersecan
 
     else if (nodo->inte->inicio == inicio && nodo->inte->fin == final) {
@@ -102,7 +103,7 @@ void push(struct sNode** top_ref, ITree t) {
     // Ponemos la información
     new_tNode->t = t; 
 
-    // Lo linjeamos a la lista vieja
+    // Lo linkeamos a la lista vieja
     new_tNode->next = (*top_ref); 
 
     // Movemos el puntero del tope de la pila al elemento ingresado
@@ -114,7 +115,7 @@ bool isEmpty(struct sNode *top) {
     return (top == NULL)? 1 : 0; 
 } 
 
-// Función para popear el elemento al tope de una pila
+// Función para popear el elemento del tope de una pila
 ITree pop(struct sNode** top_ref) { 
     ITree res; 
     struct sNode *top; 

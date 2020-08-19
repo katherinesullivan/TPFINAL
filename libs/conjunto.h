@@ -13,8 +13,6 @@ typedef struct
 
 typedef struct _ITNodo
 {
-    /*int inicio; // Inicio del intervalo
-    int fin; // Final del intervalo*/
     Intervalo *inte; // Intervalo
     struct _ITNodo *izq; // Subárbol izquierdo
     struct _ITNodo *der; // Subárbol derecho
@@ -81,8 +79,14 @@ ITree min_subarbol_derecho(ITree nodo);
  */
 ITree itree_eliminar_r(ITree nodo, int inicio, int final);
 
+/**
+ * Imprime un árbol haciendo recorrido dfs inorder.
+ */
 void itree_imprimir(ITree raiz, Intervalo* max);
 
+/**
+ * Devuelve el intervalo con números más grandes de un árbol.
+ */
 Intervalo* maximo_inte(ITree raiz);
 
 #endif /* __CONJUNTO_H__ */
