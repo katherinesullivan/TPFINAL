@@ -129,7 +129,7 @@ TablaHash* tablahash_agrandar(TablaHash* tabla) {
     tabla->tabla[idx].estado = 0;
   }
 
-  tabla->capacidad = cap*2;
+  tabla->capacidad = cap*2+9;
 
   return tabla;
 }

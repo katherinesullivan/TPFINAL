@@ -151,6 +151,7 @@ ITree itree_comp(ITree root) {
     bool band = 1;
     ITree comp;
     int inicio = INT_MIN;
+    int fin = 0;
 
     while (!done) { 
         // Nos vamos moviendo hasta el nodo más a la izquierda del árbol
@@ -166,32 +167,52 @@ ITree itree_comp(ITree root) {
             if (!isEmpty(s)) { 
                 current = pop(&s); 
                 if (band) {
+                    //printf("band 0 \n");
                     // Si estamos en el menor elemento, para crear comp
                     // le pasamos como parámetro al insertar conjuntos NULL
-                    if (inicio != current->inte->inicio) {
-                        comp = itree_insertar(NULL, inicio, current->inte->inicio -1, NULL);
+                    if (INT_MIN != current->inte->inicio) {
+                        //printf("%d \n", current->inte->inicio);
+                        //printf("entre donde no debia\n");
+                        comp = itree_insertar(NULL, INT_MIN, current->inte->inicio -1, NULL);
                         band = 0;
+                    }
+                    else {
+                        comp = itree_crear();
+                        band = 0;
+                        fin = 1;
                     }
                 }
                 else {
+                    /*if (dificultad) {
+                        //printf("en dificultad %d \n", inicio);
+                        //printf("en dificultad %d \n", current->inte->inicio);
+                        comp = itree_insertar(comp, inicio, current->inte->inicio -1, comp);
+                        dificultad = 0;
+                        // No tengo que hacer el chequeo de inicio por algo?
+                    }*/
                     // Siempre chequeamos que no sean consecutivos los elementos
                     if (inicio != current->inte->inicio) {
+                        //printf("Agregue %d %d\n", inicio, current->inte->inicio -1);
                         comp = itree_insertar(comp, inicio, current->inte->inicio -1, comp);
                     }
                 }
                 // Seteamos el inicio del próximo intervalo
                 inicio = current->inte->fin +1;
+                //printf("%d \n", inicio);
 
                 // Como ya visitamos el nodo y su subárbol izquierdo, 
                 // Ahora nos movemos al derecho.
-                current = current->der; 
+                current = current->der;
             }
             else
                 done = 1; 
         }
     }
     // Insertamos el último intervalo
-    itree_insertar(comp, inicio, INT_MAX, comp);
+    if (!fin) {
+        //printf("ja lol \n");
+        itree_insertar(comp, inicio, INT_MAX, comp);
+    }
     return comp;
 }
 

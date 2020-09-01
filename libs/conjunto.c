@@ -44,7 +44,7 @@ ITree right_rotate(ITree raiz) {
       raiz->alt = itree_altura(raiz->izq) + 1;
   }
   else{
-      raiz->alt = itree_altura(raiz->izq) + 1;
+      raiz->alt = itree_altura(raiz->der) + 1;
   }
   if (itree_altura(a->der) > itree_altura(a->izq)){
       a->alt = itree_altura(a->der) + 1;
@@ -306,7 +306,7 @@ ITree itree_eliminar_r(ITree raiz, int inicio, int final){
     raiz->alt = 1 + itree_altura(raiz->izq);
   }
   else{
-    raiz->alt = 1 + itree_altura(raiz->izq);
+    raiz->alt = 1 + itree_altura(raiz->der);
   }
 
   // Balanceamos el árbol en caso de ser necesario
